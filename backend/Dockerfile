@@ -6,11 +6,11 @@ COPY src ./src
 
 RUN mvn -q clean package -DskipTests
 
-FROM eclipse-temurin:17-jre-alpine
+FROM gcr.io/distroless/java17-debian12:nonroot
 WORKDIR /app
 
 COPY --from=build /app/target/lead-service-0.0.1-SNAPSHOT.jar app.jar
 
 EXPOSE 8080
 
-ENTRYPOINT ["java","-jar","/app/app.jar"]
+ENTRYPOINT ["app.jar"]
