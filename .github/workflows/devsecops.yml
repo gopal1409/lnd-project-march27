@@ -48,17 +48,35 @@ jobs:
         with:
           scan-type: fs
           scan-ref: .
+          scanners: vuln,secret,misconfig
           format: sarif
           output: trivy-fs.sarif
           severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: "0"
 
       - name: Run Trivy image scan
         uses: aquasecurity/trivy-action@0.28.0
         with:
+          scan-type: image
           image-ref: learnsphere-frontend:${{ github.sha }}
+          scanners: vuln,secret,misconfig
           format: sarif
           output: trivy-image.sarif
           severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: "0"
+
+      - name: Enforce frontend image security gate
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: image
+          image-ref: learnsphere-frontend:${{ github.sha }}
+          scanners: vuln
+          format: table
+          severity: CRITICAL
+          ignore-unfixed: true
+          exit-code: "1"
 
       - name: Upload filesystem scan results
         uses: github/codeql-action/upload-sarif@v4
@@ -85,10 +103,25 @@ jobs:
       - name: Run Trivy backend image scan
         uses: aquasecurity/trivy-action@0.28.0
         with:
+          scan-type: image
           image-ref: learnsphere-backend:${{ github.sha }}
+          scanners: vuln,secret,misconfig
           format: sarif
           output: trivy-backend-image.sarif
           severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: "0"
+
+      - name: Enforce backend image security gate
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: image
+          image-ref: learnsphere-backend:${{ github.sha }}
+          scanners: vuln
+          format: table
+          severity: CRITICAL
+          ignore-unfixed: true
+          exit-code: "1"
 
       - name: Upload backend scan results
         uses: github/codeql-action/upload-sarif@v4
