@@ -1,0 +1,16 @@
+CREATE TABLE IF NOT EXISTS signup_leads (
+    id BIGINT NOT NULL AUTO_INCREMENT,
+    email VARCHAR(120) NOT NULL,
+    phone_number VARCHAR(20) NOT NULL,
+    source VARCHAR(40) NOT NULL,
+    created_at DATETIME NOT NULL,
+    PRIMARY KEY (id)
+);
+
+CREATE TABLE IF NOT EXISTS courses (
+    id BIGINT NOT NULL AUTO_INCREMENT,
+    title VARCHAR(150) NOT NULL,
+    description VARCHAR(2000) NOT NULL,
+    price INT NOT NULL,
+    PRIMARY KEY (id)
+);
