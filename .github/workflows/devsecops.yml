@@ -44,7 +44,7 @@ jobs:
         run: docker build -t learnsphere-frontend:${{ github.sha }} .
 
       - name: Run Trivy filesystem scan
-        uses: aquasecurity/trivy-action@0.33.1
+        uses: aquasecurity/trivy-action@0.35.0
         with:
           scan-type: fs
           scan-ref: .
@@ -56,7 +56,7 @@ jobs:
           exit-code: "0"
 
       - name: Run Trivy image scan
-        uses: aquasecurity/trivy-action@0.33.1
+        uses: aquasecurity/trivy-action@0.35.0
         with:
           scan-type: image
           image-ref: learnsphere-frontend:${{ github.sha }}
@@ -69,7 +69,7 @@ jobs:
 
       - name: Enforce frontend image security gate
         continue-on-error: true
-        uses: aquasecurity/trivy-action@0.33.1
+        uses: aquasecurity/trivy-action@0.35.0
         with:
           scan-type: image
           image-ref: learnsphere-frontend:${{ github.sha }}
@@ -104,7 +104,7 @@ jobs:
         run: docker build -t learnsphere-backend:${{ github.sha }} ./backend
 
       - name: Run Trivy backend image scan
-        uses: aquasecurity/trivy-action@0.33.1
+        uses: aquasecurity/trivy-action@0.35.0
         with:
           scan-type: image
           image-ref: learnsphere-backend:${{ github.sha }}
@@ -117,7 +117,7 @@ jobs:
 
       - name: Enforce backend image security gate
         continue-on-error: true
-        uses: aquasecurity/trivy-action@0.33.1
+        uses: aquasecurity/trivy-action@0.35.0
         with:
           scan-type: image
           image-ref: learnsphere-backend:${{ github.sha }}
