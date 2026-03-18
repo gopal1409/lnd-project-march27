@@ -1,5 +1,6 @@
 package com.learnsphere.leadservice.lead;
 
+import com.learnsphere.leadservice.admin.AdminService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -26,6 +27,9 @@ class LeadControllerTest {
 
     @MockBean
     private LeadService leadService;
+
+    @MockBean
+    private AdminService adminService;
 
     @Test
     void createSignupLeadReturnsCreatedResponse() throws Exception {

@@ -3,13 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Signup Admin Console</title>
+    <title>Course Enquiries Admin Console</title>
     <style>
         body{margin:0;font-family:Segoe UI,sans-serif;background:#f4f7fb;color:#102048;}
-        .page{max-width:1100px;margin:0 auto;padding:40px 24px 64px;}
+        .page{max-width:1240px;margin:0 auto;padding:40px 24px 64px;}
         .hero{padding:28px 32px;border-radius:24px;background:linear-gradient(135deg,#102048 0%,#1d4ed8 100%);color:#fff;box-shadow:0 20px 50px rgba(16,32,72,.18);}
         .hero h1{margin:0 0 10px;font-size:38px;}
         .hero p{margin:0;color:rgba(255,255,255,.84);font-size:16px;line-height:1.6;}
+        .nav-links{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px;}
+        .nav-link{padding:11px 16px;border-radius:12px;background:#fff;color:#102048;font-weight:700;text-decoration:none;}
+        .nav-link.alt{background:#fff3e8;color:#ff6b00;}
         .stats{display:flex;gap:16px;flex-wrap:wrap;margin-top:24px;}
         .stat{min-width:180px;padding:18px 20px;border-radius:18px;background:#fff;color:#102048;box-shadow:0 12px 24px rgba(16,32,72,.08);}
         .stat strong{display:block;font-size:28px;}
@@ -18,22 +21,21 @@
         .panel-head{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:18px;}
         .panel-head h2{margin:0;font-size:24px;}
         .path{padding:10px 14px;border-radius:999px;background:#edf4ff;color:#1d4ed8;font-weight:700;font-size:13px;}
-        .nav-links{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px;}
-        .nav-link{padding:11px 16px;border-radius:12px;background:#fff;color:#102048;font-weight:700;text-decoration:none;}
-        .nav-link.alt{background:#fff3e8;color:#ff6b00;}
         table{width:100%;border-collapse:collapse;}
-        th,td{text-align:left;padding:16px 14px;border-bottom:1px solid #e6ebf5;font-size:15px;}
+        th,td{text-align:left;padding:16px 14px;border-bottom:1px solid #e6ebf5;font-size:15px;vertical-align:top;}
         th{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:#667085;}
         tbody tr:hover{background:#f8fbff;}
         .empty{padding:28px;border-radius:18px;background:#f8fafc;color:#667085;text-align:center;font-size:15px;}
         .badge{display:inline-block;padding:8px 12px;border-radius:999px;background:#fff3e8;color:#ff6b00;font-weight:700;font-size:12px;}
-        @media (max-width:800px){
+        .message{max-width:260px;line-height:1.6;color:#475467;white-space:pre-wrap;}
+        @media (max-width:900px){
             .hero h1{font-size:30px;}
             table,thead,tbody,th,td,tr{display:block;}
             thead{display:none;}
             tbody tr{padding:16px 0;border-bottom:1px solid #e6ebf5;}
             td{border:none;padding:8px 0;}
             td::before{content:attr(data-label);display:block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#667085;margin-bottom:4px;}
+            .message{max-width:none;}
         }
     </style>
 </head>
@@ -41,16 +43,16 @@
 <div class="page">
     <section class="hero">
         <span class="badge">Admin Console</span>
-        <h1>Signup Leads Dashboard</h1>
-        <p>Review every signup captured from the LearnSphere header modal, including email, phone number, source, and submission time.</p>
+        <h1>Course Enquiries Dashboard</h1>
+        <p>Review every course enquiry captured from the frontend form, including learner contact details, selected course, and their message.</p>
         <div class="nav-links">
             <a class="nav-link" href="/admin/signups">Signup Leads</a>
             <a class="nav-link alt" href="/admin/course-enquiries">Course Enquiries</a>
         </div>
         <div class="stats">
             <div class="stat">
-                <strong th:text="${#lists.size(leads)}">0</strong>
-                <span>Total signups</span>
+                <strong th:text="${#lists.size(enquiries)}">0</strong>
+                <span>Total enquiries</span>
             </div>
             <div class="stat">
                 <strong>Live</strong>
@@ -61,31 +63,41 @@
 
     <section class="panel">
         <div class="panel-head">
-            <h2>All Signup Information</h2>
-            <div class="path">Path: /admin/signups</div>
+            <h2>All Course Enquiries</h2>
+            <div class="path">Path: /admin/course-enquiries</div>
         </div>
 
-        <div th:if="${#lists.isEmpty(leads)}" class="empty">
-            No signup leads have been captured yet.
+        <div th:if="${#lists.isEmpty(enquiries)}" class="empty">
+            No course enquiries have been captured yet.
         </div>
 
-        <table th:if="${!#lists.isEmpty(leads)}">
+        <table th:if="${!#lists.isEmpty(enquiries)}">
             <thead>
             <tr>
                 <th>ID</th>
+                <th>Name</th>
+                <th>Company</th>
                 <th>Email</th>
-                <th>Phone Number</th>
-                <th>Source</th>
+                <th>Phone</th>
+                <th>Team Size</th>
+                <th>Training Mode</th>
+                <th>Course</th>
+                <th>Message</th>
                 <th>Created At</th>
             </tr>
             </thead>
             <tbody>
-            <tr th:each="lead : ${leads}">
-                <td data-label="ID" th:text="${lead.id}">1</td>
-                <td data-label="Email" th:text="${lead.email}">user@example.com</td>
-                <td data-label="Phone Number" th:text="${lead.phoneNumber}">9999999999</td>
-                <td data-label="Source" th:text="${lead.source}">signup-modal</td>
-                <td data-label="Created At" th:text="${#temporals.format(lead.createdAt,'dd MMM yyyy, hh:mm a')}">16 Mar 2026, 11:30 AM</td>
+            <tr th:each="enquiry : ${enquiries}">
+                <td data-label="ID" th:text="${enquiry.id}">1</td>
+                <td data-label="Name" th:text="${enquiry.name}">Alex Johnson</td>
+                <td data-label="Company" th:text="${enquiry.companyName}">Acme Corp</td>
+                <td data-label="Email" th:text="${enquiry.email}">alex@example.com</td>
+                <td data-label="Phone" th:text="${enquiry.phoneCountryCode + ' ' + enquiry.phoneNumber}">+91 9876543210</td>
+                <td data-label="Team Size" th:text="${enquiry.teamSize}">26-50</td>
+                <td data-label="Training Mode" th:text="${enquiry.preferredTrainingMode}">Hybrid</td>
+                <td data-label="Course" th:text="${enquiry.courseTitle}">DevSecOps</td>
+                <td data-label="Message"><div class="message" th:text="${#strings.isEmpty(enquiry.message) ? 'No message provided' : enquiry.message}">Need weekend batch details</div></td>
+                <td data-label="Created At" th:text="${#temporals.format(enquiry.createdAt,'dd MMM yyyy, hh:mm a')}">18 Mar 2026, 11:30 AM</td>
             </tr>
             </tbody>
         </table>

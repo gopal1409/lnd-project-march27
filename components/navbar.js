@@ -8,6 +8,17 @@ let menu=document.getElementById("resourcesMenu");
 if(menu) menu.classList.toggle("open");
 }
 
+function handleAdminNav(){
+if(isAdminLoggedIn()) go("/admin/courses");
+else go("/login");
+}
+
+function adminLogoutAction(){
+logoutAdmin();
+renderNavbar();
+go("/");
+}
+
 function openSignupModal(){
 let modal=document.getElementById("signupModal");
 if(modal) modal.classList.add("open");
@@ -112,9 +123,10 @@ document.getElementById("navbar").innerHTML=`
 <button class="resource-item" onclick="go('/courses?q=community')">Community</button>
 </div>
 </div>
-<button onclick="go('/login')">Login</button>
+<button onclick="handleAdminNav()">${isAdminLoggedIn()?"Admin":"Login"}</button>
 <button class="enquiry" onclick="go('/enquiry')">ENQUIRE</button>
 <button class="signup-btn" onclick="openSignupModal()">Sign Up</button>
+${isAdminLoggedIn()?`<button class="nav-link-btn" onclick="adminLogoutAction()">Logout</button>`:""}
 </div>
 </nav>`;
 

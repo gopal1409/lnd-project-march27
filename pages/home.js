@@ -39,7 +39,7 @@ let spotlight=featuredCourses.length
 <span>Stay Tuned</span>
 </div>`;
 let trendingHtml=trendingTopics.map(section=>`
-<article class="trending-card" onclick="go('/courses?topic=${section.slug}')">
+<article class="trending-card" onclick="go('/learn?topic=${section.slug}')">
 <h3>${section.title}</h3>
 <p>${section.items.join(", ")}</p>
 </article>`).join("");

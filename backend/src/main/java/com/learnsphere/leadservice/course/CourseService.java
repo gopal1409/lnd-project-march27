@@ -25,6 +25,15 @@ public class CourseService {
                 .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Course not found"));
     }
 
+    public Course createCourse(CourseCreateRequest request) {
+        Course course = new Course(
+                request.title().trim(),
+                request.description().trim(),
+                request.price() == null ? 0 : request.price()
+        );
+        return courseRepository.save(course);
+    }
+
     public void seedCoursesIfEmpty() {
         if (courseRepository.count() > 0) {
             return;

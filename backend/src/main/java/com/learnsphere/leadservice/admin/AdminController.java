@@ -19,4 +19,10 @@ public class AdminController {
         model.addAttribute("leads", leadService.getAllSignupLeads());
         return "admin-signups";
     }
+
+    @GetMapping("/admin/course-enquiries")
+    public String courseEnquiryConsole(Model model) {
+        model.addAttribute("enquiries", leadService.getAllCourseEnquiries());
+        return "admin-course-enquiries";
+    }
 }

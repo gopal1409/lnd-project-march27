@@ -66,10 +66,28 @@ Request body:
 }
 ```
 
+## Course enquiry endpoint
+
+`POST /api/leads/course-enquiry`
+
+Request body:
+
+```json
+{
+  "name": "Alex Johnson",
+  "email": "alex@example.com",
+  "phoneCountryCode": "+91",
+  "phoneNumber": "9876543210",
+  "courseId": 1,
+  "message": "Need weekend batch details"
+}
+```
+
 ## Course endpoints
 
 - `GET /api/courses`
 - `GET /api/courses/{id}`
+- `POST /api/courses` with `Authorization: Bearer <admin-token>`
 
 The application seeds starter course records automatically when the `courses` table is empty.
 
@@ -80,3 +98,20 @@ Open the signup admin console at:
 `http://localhost:8080/admin/signups`
 
 It shows all signup leads stored from the frontend modal.
+
+Open the course enquiry admin console at:
+
+`http://localhost:8080/admin/course-enquiries`
+
+It shows all course enquiries submitted from the frontend enquiry form.
+
+These `/admin/*` pages are protected with HTTP Basic authentication.
+
+Default admin console credentials:
+
+- Username: `admin`
+- Password: `Admin@123`
+
+You can override them with `ADMIN_CONSOLE_USERNAME` and `ADMIN_CONSOLE_PASSWORD`.
+
+The protected admin API for `POST /api/courses` uses the same HTTP Basic username/password.

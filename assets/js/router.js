@@ -8,4 +8,5 @@ else if(p==="/courses") courses();
 else if(p.startsWith("/course")) courseDetails();
 else if(p.startsWith("/learn")) learning();
 else if(p==="/enquiry") enquiry();
+else if(p==="/admin/courses") adminCourses();
 }

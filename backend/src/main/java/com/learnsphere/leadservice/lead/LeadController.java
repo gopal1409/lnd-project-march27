@@ -32,4 +32,15 @@ public class LeadController {
                 "email", lead.getEmail()
         );
     }
+
+    @PostMapping("/course-enquiry")
+    @ResponseStatus(HttpStatus.CREATED)
+    public Map<String, Object> createCourseEnquiry(@Valid @RequestBody CourseEnquiryRequest request) {
+        CourseEnquiry enquiry = leadService.createCourseEnquiry(request);
+        return Map.of(
+                "message", "Course enquiry submitted successfully",
+                "id", enquiry.getId(),
+                "courseTitle", enquiry.getCourseTitle()
+        );
+    }
 }
