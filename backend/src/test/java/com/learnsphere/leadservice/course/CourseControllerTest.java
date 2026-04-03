@@ -21,6 +21,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -39,7 +40,7 @@ class CourseControllerTest {
 
     @Test
     void getCoursesReturnsAvailableCourses() throws Exception {
-        Course course = new Course("DevSecOps", "Security-first delivery", 49999);
+        Course course = new Course("DevSecOps", "Security-first delivery", 49999, "Why it matters", "About the toolchain", "What is it?\nIt is practical.");
         when(courseService.getAllCourses()).thenReturn(List.of(course));
 
         mockMvc.perform(get("/api/courses"))
@@ -60,7 +61,7 @@ class CourseControllerTest {
 
     @Test
     void createCourseReturnsCreatedCourseForAuthorizedAdmin() throws Exception {
-        Course course = new Course("Platform Engineering", "Build internal developer platforms", 0);
+        Course course = new Course("Platform Engineering", "Build internal developer platforms", 35000, "Why learn", "Toolchain details", "Question?\nAnswer.");
         ReflectionTestUtils.setField(course, "id", 8L);
         doNothing().when(adminService).validateBasicAuth(eq("Basic YWRtaW46QWRtaW5AMTIz"));
         when(courseService.createCourse(any(CourseCreateRequest.class))).thenReturn(course);
@@ -71,12 +72,42 @@ class CourseControllerTest {
                         .content("""
                                 {
                                   "title": "Platform Engineering",
-                                  "description": "Build internal developer platforms"
+                                  "description": "Build internal developer platforms",
+                                  "price": 35000,
+                                  "whyLearn": "Why learn",
+                                  "toolchainOverview": "Toolchain details",
+                                  "faqContent": "Question?\\nAnswer."
                                 }
                                 """))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(8))
                 .andExpect(jsonPath("$.title").value("Platform Engineering"))
-                .andExpect(jsonPath("$.price").value(0));
+                .andExpect(jsonPath("$.price").value(35000));
+    }
+
+    @Test
+    void updateCourseReturnsUpdatedCourseForAuthorizedAdmin() throws Exception {
+        Course course = new Course("Azure DevOps", "Updated content", 36000, "Updated why", "Updated toolchain", "Who is this for?\nTeams.");
+        ReflectionTestUtils.setField(course, "id", 5L);
+        doNothing().when(adminService).validateBasicAuth(eq("Basic YWRtaW46QWRtaW5AMTIz"));
+        when(courseService.updateCourse(eq(5L), any(CourseCreateRequest.class))).thenReturn(course);
+
+        mockMvc.perform(put("/api/courses/5")
+                        .header("Authorization", "Basic YWRtaW46QWRtaW5AMTIz")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "title": "Azure DevOps",
+                                  "description": "Updated content",
+                                  "price": 36000,
+                                  "whyLearn": "Updated why",
+                                  "toolchainOverview": "Updated toolchain",
+                                  "faqContent": "Who is this for?\\nTeams."
+                                }
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(5))
+                .andExpect(jsonPath("$.title").value("Azure DevOps"))
+                .andExpect(jsonPath("$.whyLearn").value("Updated why"));
     }
 }

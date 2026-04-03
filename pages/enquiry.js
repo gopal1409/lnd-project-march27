@@ -30,7 +30,7 @@ app.innerHTML=`
 </section>
 
 <section class="trust-strip">
-<span class="trust-label">Trusted learning themes for teams</span>
+<span class="trust-label">Trusted Learning Partners</span>
 <div class="logo-row">
 <div class="logo-chip">CloudOps</div>
 <div class="logo-chip">FinEdge</div>

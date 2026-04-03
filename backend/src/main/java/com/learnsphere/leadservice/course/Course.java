@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 
 @Entity
@@ -18,19 +19,35 @@ public class Course {
     @Column(nullable = false, length = 150)
     private String title;
 
-    @Column(nullable = false, length = 2000)
+    @Lob
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 
     @Column(nullable = false)
     private Integer price;
 
+    @Lob
+    @Column(nullable = false, columnDefinition = "TEXT")
+    private String whyLearn;
+
+    @Lob
+    @Column(nullable = false, columnDefinition = "TEXT")
+    private String toolchainOverview;
+
+    @Lob
+    @Column(nullable = false, columnDefinition = "TEXT")
+    private String faqContent;
+
     public Course() {
     }
 
-    public Course(String title, String description, Integer price) {
+    public Course(String title, String description, Integer price, String whyLearn, String toolchainOverview, String faqContent) {
         this.title = title;
         this.description = description;
         this.price = price;
+        this.whyLearn = whyLearn;
+        this.toolchainOverview = toolchainOverview;
+        this.faqContent = faqContent;
     }
 
     public Long getId() {
@@ -59,5 +76,29 @@ public class Course {
 
     public void setPrice(Integer price) {
         this.price = price;
+    }
+
+    public String getWhyLearn() {
+        return whyLearn;
+    }
+
+    public void setWhyLearn(String whyLearn) {
+        this.whyLearn = whyLearn;
+    }
+
+    public String getToolchainOverview() {
+        return toolchainOverview;
+    }
+
+    public void setToolchainOverview(String toolchainOverview) {
+        this.toolchainOverview = toolchainOverview;
+    }
+
+    public String getFaqContent() {
+        return faqContent;
+    }
+
+    public void setFaqContent(String faqContent) {
+        this.faqContent = faqContent;
     }
 }

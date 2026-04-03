@@ -68,7 +68,7 @@ class LeadServiceTest {
 
     @Test
     void createCourseEnquiryPersistsSelectedCourseAndPhoneParts() {
-        Course course = new Course("DevSecOps", "Security-first delivery", 49999);
+        Course course = new Course("DevSecOps", "Security-first delivery", 49999, "Why it matters", "Toolchain overview", "What is it?\nIt is practical.");
         org.springframework.test.util.ReflectionTestUtils.setField(course, "id", 3L);
         CourseEnquiry saved = new CourseEnquiry();
         saved.setName("Alex");

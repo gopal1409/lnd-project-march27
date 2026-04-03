@@ -58,10 +58,11 @@ closeResources();
 
 async function submitSignupLead(){
 let email=document.getElementById("signupEmail");
+let countryCode=document.getElementById("signupCountryCode");
 let phone=document.getElementById("signupPhone");
 let feedback=document.getElementById("signupFeedback");
 let submit=document.getElementById("signupSubmit");
-if(!email||!phone||!feedback||!submit) return;
+if(!email||!countryCode||!phone||!feedback||!submit) return;
 
 let emailValue=email.value.trim();
 let phoneValue=phone.value.trim();
@@ -77,7 +78,7 @@ feedback.textContent="";
 feedback.className="signup-feedback";
 
 try{
-let result=await createSignupLead({email:emailValue,phoneNumber:phoneValue});
+let result=await createSignupLead({email:emailValue,phoneNumber:`${countryCode.value} ${phoneValue}`});
 feedback.textContent=result.message||"Signup completed successfully.";
 feedback.className="signup-feedback success";
 setTimeout(closeSignupModal,1200);
@@ -96,6 +97,19 @@ submit.textContent="Continue";
 }
 
 async function renderNavbar(){
+let categoryCatalog=[
+{label:"DevOps Engineering",path:"/blogs?category=DevOps"},
+{label:"DevSecOps",path:"/blogs?category=DevSecOps"},
+{label:"Infrastructure as Code",path:"/blogs?category=Infrastructure%20as%20Code"},
+{label:"Jenkins",path:"/blogs?category=Jenkins"},
+{label:"GitHub Actions",path:"/blogs?category=GitHub%20Actions"},
+{label:"GitLab CI/CD",path:"/blogs?category=GitLab%20CI%2FCD"},
+{label:"Azure DevOps",path:"/blogs?category=Azure%20DevOps"},
+{label:"AWS Solution Architecture",path:"/blogs?category=AWS%20Solution%20Architecture"},
+{label:"Azure Solution Architecture",path:"/blogs?category=Azure%20Solution%20Architecture"},
+{label:"Google Cloud Solution Architecture",path:"/blogs?category=Google%20Cloud%20Solution%20Architecture"}
+];
+
 document.getElementById("navbar").innerHTML=`
 <nav class="nav">
 <div class="logo" onclick="go('/')">LearnSphere</div>
@@ -107,25 +121,25 @@ document.getElementById("navbar").innerHTML=`
 <div class="categories-wrap">
 <button class="categories-btn" onclick="toggleCategories()">Categories</button>
 <div id="categoriesMenu" class="categories-menu">
-<div class="categories-title">All Courses</div>
+<div class="categories-title">Popular Tracks</div>
 <div id="categoriesList" class="categories-list">
-<button class="category-item" onclick="go('/courses')">Browse all courses</button>
+${categoryCatalog.map(item=>`<button class="category-item" onclick="go('${item.path}')">${item.label}</button>`).join("")}
 </div>
 </div>
 </div>
-<button class="nav-link-btn" onclick="go('/courses')">All Courses</button>
 <button class="nav-link-btn" onclick="go('/enquiry')">Corporate Training</button>
 <div class="resources-wrap">
 <button class="nav-link-btn" onclick="toggleResources()">Resources</button>
 <div id="resourcesMenu" class="resources-menu">
 <button class="resource-item" onclick="go('/courses?q=webinar')">Webinar</button>
-<button class="resource-item" onclick="go('/courses?q=blogs')">Blogs</button>
+<button class="resource-item" onclick="go('/blogs')">Blogs</button>
 <button class="resource-item" onclick="go('/courses?q=community')">Community</button>
 </div>
 </div>
 <button onclick="handleAdminNav()">${isAdminLoggedIn()?"Admin":"Login"}</button>
 <button class="enquiry" onclick="go('/enquiry')">ENQUIRE</button>
 <button class="signup-btn" onclick="openSignupModal()">Sign Up</button>
+${isAdminLoggedIn()?`<button class="nav-link-btn" onclick="go('/admin/blogs')">Write Blog</button>`:""}
 ${isAdminLoggedIn()?`<button class="nav-link-btn" onclick="adminLogoutAction()">Logout</button>`:""}
 </div>
 </nav>`;
@@ -135,12 +149,11 @@ if(!list) return;
 try{
 let courses=await getCourses();
 if(courses.length){
-list.innerHTML=`<button class="category-item" onclick="go('/courses')">Browse all courses</button>`+
-courses.map(c=>`<button class="category-item" onclick="go('/course?id=${c.id}')">${c.title}</button>`).join("");
+list.innerHTML=categoryCatalog.map(item=>`<button class="category-item" onclick="go('${item.path}')">${item.label}</button>`).join("");
 }
 }catch(e){
-list.innerHTML=`<button class="category-item" onclick="go('/courses')">Browse all courses</button>
-<div class="category-empty">Unable to load courses right now</div>`;
+list.innerHTML=categoryCatalog.map(item=>`<button class="category-item" onclick="go('${item.path}')">${item.label}</button>`).join("")+
+`<div class="category-empty">Unable to load courses right now</div>`;
 }
 }
 
@@ -166,7 +179,16 @@ document.body.insertAdjacentHTML("beforeend",`
 <label>Email ID</label>
 <input id="signupEmail" type="email" placeholder="Enter your email address">
 <label>Phone Number</label>
+<div class="phone-row">
+<select id="signupCountryCode" aria-label="Country code">
+<option value="+91">India (+91)</option>
+<option value="+1">USA (+1)</option>
+<option value="+44">UK (+44)</option>
+<option value="+61">Australia (+61)</option>
+<option value="+971">UAE (+971)</option>
+</select>
 <input id="signupPhone" type="tel" placeholder="Enter your phone number">
+</div>
 <button id="signupSubmit" type="submit" class="signup-submit">Continue</button>
 </form>
 <p id="signupFeedback" class="signup-feedback"></p>

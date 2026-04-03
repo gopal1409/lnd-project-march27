@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,5 +44,15 @@ public class CourseController {
     ) {
         adminService.validateBasicAuth(authorizationHeader);
         return courseService.createCourse(request);
+    }
+
+    @PutMapping("/{id}")
+    public Course updateCourse(
+            @PathVariable Long id,
+            @RequestHeader(value = "Authorization", required = false) String authorizationHeader,
+            @Valid @RequestBody CourseCreateRequest request
+    ) {
+        adminService.validateBasicAuth(authorizationHeader);
+        return courseService.updateCourse(id, request);
     }
 }

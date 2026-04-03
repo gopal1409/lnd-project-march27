@@ -1,5 +1,6 @@
 package com.learnsphere.leadservice.admin;
 
+import com.learnsphere.leadservice.blog.BlogService;
 import com.learnsphere.leadservice.lead.LeadService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -9,9 +10,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class AdminController {
 
     private final LeadService leadService;
+    private final BlogService blogService;
 
-    public AdminController(LeadService leadService) {
+    public AdminController(LeadService leadService, BlogService blogService) {
         this.leadService = leadService;
+        this.blogService = blogService;
     }
 
     @GetMapping("/admin/signups")
@@ -24,5 +27,11 @@ public class AdminController {
     public String courseEnquiryConsole(Model model) {
         model.addAttribute("enquiries", leadService.getAllCourseEnquiries());
         return "admin-course-enquiries";
+    }
+
+    @GetMapping("/admin/blogs")
+    public String blogConsole(Model model) {
+        model.addAttribute("blogs", blogService.getAllBlogs());
+        return "admin-blogs";
     }
 }

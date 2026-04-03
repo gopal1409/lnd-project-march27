@@ -10,6 +10,43 @@ if(!modal) return;
 modal.classList.add("open");
 }
 
+function normalizeCourseTopic(value){
+return (value||"")
+    .toLowerCase()
+    .replace(/engineering/g,"")
+    .replace(/solution/g,"")
+    .replace(/architecture/g,"architect")
+    .replace(/program/g,"")
+    .replace(/bootcamp/g,"")
+    .replace(/master/g,"")
+    .replace(/[^a-z0-9]+/g," ")
+    .trim();
+}
+
+function parseCourseFaqs(text){
+return (text||"")
+    .split(/\n\s*\n/)
+    .map(block=>block.trim())
+    .filter(Boolean)
+    .map(block=>{
+        let lines=block.split("\n").map(line=>line.trim()).filter(Boolean);
+        return {
+            question:lines[0]||"",
+            answer:lines.slice(1).join(" ")||"More details will be shared by our team."
+        };
+    })
+    .filter(item=>item.question);
+}
+
+function formatCourseParagraphs(text){
+return (text||"")
+    .split(/\n\s*\n/)
+    .map(block=>block.trim())
+    .filter(Boolean)
+    .map(block=>`<p>${block}</p>`)
+    .join("");
+}
+
 async function submitCourseEnrollForm(courseId){
 let name=document.getElementById("courseEnrollName");
 let email=document.getElementById("courseEnrollEmail");
@@ -75,23 +112,28 @@ try{
 let r=await api("/courses/"+id);
 if(!r.ok) throw new Error("Unable to load course details.");
 let c=await r.json();
-let outcomes=[
-"Build practical job-ready skills through guided hands-on exercises.",
-"Understand how the tools are used in real delivery teams and projects.",
-"Work through workflows, use cases, and implementation patterns step by step."
-];
-let curriculum=[
-"Program overview and business context",
-"Core concepts explained in simple practical terms",
-"Tooling, workflows, and implementation walkthroughs",
-"Hands-on exercises and portfolio-style practice",
-"Career support, use cases, and next-step guidance"
-];
-let projects=[
-"Mini implementation labs that simulate real project scenarios",
-"Case-study style exercises to apply concepts with confidence",
-"Structured assignments that help you convert theory into execution"
-];
+
+let faqs=parseCourseFaqs(c.faqContent);
+let blogs=[];
+try{
+blogs=await getBlogs();
+}catch(e){
+blogs=[];
+}
+blogs=Array.isArray(blogs)?blogs:[];
+
+let normalizedCourseTopic=normalizeCourseTopic(c.title);
+let latestBlog=blogs
+    .filter(blog=>{
+        let categoryTopic=normalizeCourseTopic(blog.category);
+        let blogTopic=normalizeCourseTopic(`${blog.title} ${blog.summary}`);
+        return categoryTopic&&(
+            categoryTopic.includes(normalizedCourseTopic)||
+            normalizedCourseTopic.includes(categoryTopic)||
+            blogTopic.includes(normalizedCourseTopic)
+        );
+    })
+    .sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0))[0];
 
 app.innerHTML=`
 <section class="learning-page">
@@ -107,8 +149,8 @@ app.innerHTML=`
 </div>
 <aside class="learning-sidebar">
 <div class="learning-side-card">
-<h3>What you will get</h3>
-<p>An article-style learning overview with practical depth, implementation context, and a guided path toward enrolling in the full program.</p>
+<h3>Why learn this course</h3>
+<p>${c.whyLearn}</p>
 </div>
 <div class="learning-side-card">
 <h3>Program focus</h3>
@@ -124,25 +166,27 @@ app.innerHTML=`
 
 <section class="learning-grid course-program-grid">
 <article class="learning-card">
-<h2>Why this program stands out</h2>
-<ul class="learning-list">${outcomes.map(item=>`<li>${item}</li>`).join("")}</ul>
+<h2>Why this toolchain matters</h2>
+<div class="course-rich-copy">${formatCourseParagraphs(c.whyLearn)}</div>
 </article>
 <article class="learning-card">
-<h2>How the journey is structured</h2>
-<ul class="learning-list">${curriculum.map(item=>`<li>${item}</li>`).join("")}</ul>
+<h2>About this toolchain</h2>
+<div class="course-rich-copy">${formatCourseParagraphs(c.toolchainOverview)}</div>
 </article>
 <article class="learning-card">
-<h2>What you will practice</h2>
-<ul class="learning-list">${projects.map(item=>`<li>${item}</li>`).join("")}</ul>
+<h2>Course snapshot</h2>
+<ul class="learning-list">
+<li>Detailed admin-managed course content for this specific program.</li>
+<li>Practical context around tools, workflows, and delivery patterns.</li>
+<li>Guided next steps through FAQs, related blogs, and enrollment support.</li>
+</ul>
 </article>
 </section>
 
 <section class="learning-article course-program-article">
 <article class="learning-article-main">
-<h2>Strong article with practical knowledge</h2>
-<p>This course page is designed more like a program article than a short catalog card. Instead of only showing a title and a description, it gives learners a clearer picture of how the knowledge translates into practical work, project execution, and career-ready capability.</p>
-<p>You should expect a guided experience that starts with fundamentals, connects them to business or technical use cases, and then moves into real workflows. That means learning not just what something is, but how teams actually use it, where mistakes usually happen, and what good execution looks like in practice.</p>
-<p>The goal is to help learners make a better decision before enrolling. After a short delay, the page invites them to take the next step with a lightweight enrollment popup so interest turns into an actual enquiry without interrupting the initial reading experience too early.</p>
+<h2>About this course</h2>
+<div class="course-rich-copy">${formatCourseParagraphs(c.toolchainOverview)}</div>
 <div class="learning-actions">
 <button class="enquiry" type="button" onclick="openCourseEnrollModal()">Request Enrollment</button>
 <button class="nav-link-btn learning-secondary" type="button" onclick="go('/courses')">Explore More Courses</button>
@@ -150,14 +194,23 @@ app.innerHTML=`
 </article>
 <aside class="learning-article-aside">
 <div class="learning-side-card">
-<h3>Best for</h3>
-<p>Learners who want a structured path, practical examples, and direct support while evaluating the right program.</p>
+<h3>Latest related blog post</h3>
+${latestBlog?`<p><strong>${latestBlog.title}</strong></p><p>${latestBlog.summary}</p><button class="enquiry" type="button" onclick="go('/blog?id=${latestBlog.id}')">Read Latest Blog</button>`:`<p>No related blog post is available yet. Publish a blog in the matching topic from the admin panel and it will appear here.</p>`}
 </div>
 <div class="learning-side-card">
 <h3>Popup timing</h3>
 <p>The enrollment screen appears automatically after 5 seconds, and you can also open it any time using the enroll buttons on this page.</p>
 </div>
 </aside>
+</section>
+
+<section class="learning-grid course-faq-grid">
+<article class="learning-card course-faq-card">
+<h2>FAQ</h2>
+<div class="course-faq-list">
+${faqs.length?faqs.map(item=>`<div class="course-faq-item"><h3>${item.question}</h3><p>${item.answer}</p></div>`).join(""):`<p>No FAQs added for this course yet.</p>`}
+</div>
+</article>
 </section>
 
 <div id="courseEnrollModal" class="course-enroll-modal" onclick="if(event.target===this) closeCourseEnrollModal()">

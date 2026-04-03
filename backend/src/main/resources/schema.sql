@@ -10,10 +10,17 @@ CREATE TABLE IF NOT EXISTS signup_leads (
 CREATE TABLE IF NOT EXISTS courses (
     id BIGINT NOT NULL AUTO_INCREMENT,
     title VARCHAR(150) NOT NULL,
-    description VARCHAR(2000) NOT NULL,
+    description TEXT NOT NULL,
     price INT NOT NULL,
+    why_learn TEXT NOT NULL,
+    toolchain_overview TEXT NOT NULL,
+    faq_content TEXT NOT NULL,
     PRIMARY KEY (id)
 );
+
+ALTER TABLE courses ADD COLUMN IF NOT EXISTS why_learn TEXT NULL;
+ALTER TABLE courses ADD COLUMN IF NOT EXISTS toolchain_overview TEXT NULL;
+ALTER TABLE courses ADD COLUMN IF NOT EXISTS faq_content TEXT NULL;
 
 CREATE TABLE IF NOT EXISTS course_enquiries (
     id BIGINT NOT NULL AUTO_INCREMENT,
@@ -27,6 +34,18 @@ CREATE TABLE IF NOT EXISTS course_enquiries (
     course_id BIGINT NOT NULL,
     course_title VARCHAR(150) NOT NULL,
     message VARCHAR(2000),
+    created_at DATETIME NOT NULL,
+    PRIMARY KEY (id)
+);
+
+CREATE TABLE IF NOT EXISTS blogs (
+    id BIGINT NOT NULL AUTO_INCREMENT,
+    title VARCHAR(180) NOT NULL,
+    summary VARCHAR(500) NOT NULL,
+    content VARCHAR(12000) NOT NULL,
+    category VARCHAR(80) NOT NULL,
+    author_name VARCHAR(120) NOT NULL,
+    cover_image_url VARCHAR(500),
     created_at DATETIME NOT NULL,
     PRIMARY KEY (id)
 );

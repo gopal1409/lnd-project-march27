@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blogs Admin Console</title>
+    <style>
+        body{margin:0;font-family:Segoe UI,sans-serif;background:#f4f7fb;color:#102048;}
+        .page{max-width:1240px;margin:0 auto;padding:40px 24px 64px;}
+        .hero{padding:28px 32px;border-radius:24px;background:linear-gradient(135deg,#102048 0%,#1d4ed8 100%);color:#fff;box-shadow:0 20px 50px rgba(16,32,72,.18);}
+        .hero h1{margin:0 0 10px;font-size:38px;}
+        .hero p{margin:0;color:rgba(255,255,255,.84);font-size:16px;line-height:1.6;}
+        .nav-links{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px;}
+        .nav-link{padding:11px 16px;border-radius:12px;background:#fff;color:#102048;font-weight:700;text-decoration:none;}
+        .nav-link.alt{background:#fff3e8;color:#ff6b00;}
+        .stats{display:flex;gap:16px;flex-wrap:wrap;margin-top:24px;}
+        .stat{min-width:180px;padding:18px 20px;border-radius:18px;background:#fff;color:#102048;box-shadow:0 12px 24px rgba(16,32,72,.08);}
+        .stat strong{display:block;font-size:28px;}
+        .stat span{display:block;margin-top:6px;color:#667085;font-size:14px;}
+        .panel{margin-top:28px;padding:24px;border-radius:24px;background:#fff;box-shadow:0 12px 30px rgba(16,32,72,.08);}
+        .panel-head{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:18px;}
+        .panel-head h2{margin:0;font-size:24px;}
+        .path{padding:10px 14px;border-radius:999px;background:#edf4ff;color:#1d4ed8;font-weight:700;font-size:13px;}
+        table{width:100%;border-collapse:collapse;}
+        th,td{text-align:left;padding:16px 14px;border-bottom:1px solid #e6ebf5;font-size:15px;vertical-align:top;}
+        th{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:#667085;}
+        tbody tr:hover{background:#f8fbff;}
+        .empty{padding:28px;border-radius:18px;background:#f8fafc;color:#667085;text-align:center;font-size:15px;}
+        .badge{display:inline-block;padding:8px 12px;border-radius:999px;background:#fff3e8;color:#ff6b00;font-weight:700;font-size:12px;}
+        .summary{max-width:320px;line-height:1.6;color:#475467;}
+        .actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:18px;}
+        .action-link{padding:11px 16px;border-radius:12px;background:#fff;color:#102048;font-weight:700;text-decoration:none;}
+        .action-link.alt{background:#fff3e8;color:#ff6b00;}
+        @media (max-width:900px){
+            .hero h1{font-size:30px;}
+            table,thead,tbody,th,td,tr{display:block;}
+            thead{display:none;}
+            tbody tr{padding:16px 0;border-bottom:1px solid #e6ebf5;}
+            td{border:none;padding:8px 0;}
+            td::before{content:attr(data-label);display:block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#667085;margin-bottom:4px;}
+            .summary{max-width:none;}
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+    <section class="hero">
+        <span class="badge">Admin Console</span>
+        <h1>Published Blogs Dashboard</h1>
+        <p>Review every blog post stored in the backend, including category, author, summary, and publish date.</p>
+        <div class="nav-links">
+            <a class="nav-link" href="/admin/signups">Signup Leads</a>
+            <a class="nav-link" href="/admin/course-enquiries">Course Enquiries</a>
+            <a class="nav-link alt" href="/admin/blogs">Blogs</a>
+        </div>
+        <div class="actions">
+            <a class="action-link alt" href="http://localhost/admin/blogs">Open Blog Writer UI</a>
+            <a class="action-link" href="http://localhost/blogs">Open Public Blog Page</a>
+        </div>
+        <div class="stats">
+            <div class="stat">
+                <strong th:text="${#lists.size(blogs)}">0</strong>
+                <span>Total blogs</span>
+            </div>
+            <div class="stat">
+                <strong>Live</strong>
+                <span>Connected to Spring Boot + MySQL</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="panel">
+        <div class="panel-head">
+            <h2>All Published Blogs</h2>
+            <div class="path">Path: /admin/blogs</div>
+        </div>
+
+        <div th:if="${#lists.isEmpty(blogs)}" class="empty">
+            No blogs have been published yet.
+        </div>
+
+        <table th:if="${!#lists.isEmpty(blogs)}">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Title</th>
+                <th>Category</th>
+                <th>Author</th>
+                <th>Summary</th>
+                <th>Created At</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="blog : ${blogs}">
+                <td data-label="ID" th:text="${blog.id}">1</td>
+                <td data-label="Title" th:text="${blog.title}">Designing Better Blog Pages</td>
+                <td data-label="Category" th:text="${blog.category}">Design</td>
+                <td data-label="Author" th:text="${blog.authorName}">LearnSphere Editorial</td>
+                <td data-label="Summary"><div class="summary" th:text="${blog.summary}">Short summary</div></td>
+                <td data-label="Created At" th:text="${#temporals.format(blog.createdAt,'dd MMM yyyy, hh:mm a')}">03 Apr 2026, 11:30 AM</td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+</div>
+</body>
+</html>
