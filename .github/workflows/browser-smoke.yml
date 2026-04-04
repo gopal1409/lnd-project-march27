@@ -40,11 +40,6 @@ jobs:
           java-version: "21"
           cache: maven
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.x"
-
       - name: Set up Chrome
         if: matrix.browser == 'chrome'
         uses: browser-actions/setup-chrome@v1
@@ -61,31 +56,27 @@ jobs:
         if: matrix.browser == 'safari'
         run: safaridriver --enable || true
 
-      - name: Start frontend server
-        run: |
-          python -m http.server 8080 > frontend.log 2>&1 &
-
       - name: Start backend server
         working-directory: backend
         run: |
           mvn -B -Dspring-boot.run.useTestClasspath=true "-Dspring-boot.run.arguments=--spring.profiles.active=test --server.port=8081" spring-boot:run > ../backend.log 2>&1 &
 
-      - name: Wait for frontend and backend
+      - name: Wait for backend
         shell: bash
         run: |
           for i in {1..60}; do
-            if curl -fsS http://127.0.0.1:8080 >/dev/null && curl -fsS http://127.0.0.1:8081/api/courses >/dev/null; then
+            if curl -fsS http://127.0.0.1:8081 >/dev/null && curl -fsS http://127.0.0.1:8081/api/courses >/dev/null; then
               exit 0
             fi
             sleep 2
           done
-          echo "Frontend or backend did not become ready in time."
+          echo "Backend did not become ready in time."
           exit 1
 
       - name: Run Selenium smoke tests
         working-directory: backend
         run: |
-          mvn -B -Dtest=CrossBrowserSmokeTest -Dbrowser=${{ matrix.browser }} -DbaseUrl=http://127.0.0.1:8080 test
+          mvn -B -Dtest=CrossBrowserSmokeTest -Dbrowser=${{ matrix.browser }} -DbaseUrl=http://127.0.0.1:8081 test
 
       - name: Upload browser logs
         if: always()
@@ -93,5 +84,4 @@ jobs:
         with:
           name: browser-smoke-${{ matrix.browser }}-logs
           path: |
-            frontend.log
             backend.log
