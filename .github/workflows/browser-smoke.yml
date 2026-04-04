@@ -56,23 +56,38 @@ jobs:
         if: matrix.browser == 'safari'
         run: safaridriver --enable || true
 
+      - name: Build backend jar
+        working-directory: backend
+        run: mvn -B -DskipTests package
+
       - name: Run Selenium smoke tests
         shell: bash
         run: |
           cd backend
-          nohup mvn -B -Dspring-boot.run.useTestClasspath=true "-Dspring-boot.run.arguments=--spring.profiles.active=test --server.port=8081" spring-boot:run > ../backend.log 2>&1 &
+          nohup java -Dspring.profiles.active=test -jar target/lead-service-0.0.1-SNAPSHOT.jar --server.port=8081 > ../backend.log 2>&1 &
           BACKEND_PID=$!
           trap "kill $BACKEND_PID || true" EXIT
 
           for i in {1..90}; do
             if curl -fsS http://127.0.0.1:8081 >/dev/null && curl -fsS http://127.0.0.1:8081/api/courses >/dev/null; then
-              mvn -B -Dtest=CrossBrowserSmokeTest -Dbrowser=${{ matrix.browser }} -DbaseUrl=http://127.0.0.1:8081 test
-              exit $?
+              for attempt in {1..5}; do
+                echo "Selenium attempt ${attempt} of 5"
+                if mvn -B -Dtest=CrossBrowserSmokeTest -Dbrowser=${{ matrix.browser }} -DbaseUrl=http://127.0.0.1:8081 test; then
+                  exit 0
+                fi
+                if [ "$attempt" -lt 5 ]; then
+                  echo "Selenium run failed, retrying after 5 seconds..."
+                  sleep 5
+                fi
+              done
+              echo "Selenium smoke tests failed after 5 attempts."
+              exit 1
             fi
             sleep 2
           done
 
           echo "Backend did not become ready in time."
+          tail -200 ../backend.log || true
           exit 1
 
       - name: Upload browser logs
