@@ -38,16 +38,21 @@ public class Course {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String faqContent;
 
+    @Lob
+    @Column(nullable = false, columnDefinition = "TEXT")
+    private String readmeContent;
+
     public Course() {
     }
 
-    public Course(String title, String description, Integer price, String whyLearn, String toolchainOverview, String faqContent) {
+    public Course(String title, String description, Integer price, String whyLearn, String toolchainOverview, String faqContent, String readmeContent) {
         this.title = title;
         this.description = description;
         this.price = price;
         this.whyLearn = whyLearn;
         this.toolchainOverview = toolchainOverview;
         this.faqContent = faqContent;
+        this.readmeContent = readmeContent;
     }
 
     public Long getId() {
@@ -100,5 +105,13 @@ public class Course {
 
     public void setFaqContent(String faqContent) {
         this.faqContent = faqContent;
+    }
+
+    public String getReadmeContent() {
+        return readmeContent;
+    }
+
+    public void setReadmeContent(String readmeContent) {
+        this.readmeContent = readmeContent;
     }
 }

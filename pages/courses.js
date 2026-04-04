@@ -69,7 +69,7 @@ return `
 </td>
 <td data-label="Actions">
 <div class="course-table-actions">
-<button class="nav-link-btn admin-page-link" type="button" onclick="event.stopPropagation(); go('/course?id=${c.id}')">View Details</button>
+<button class="nav-link-btn admin-page-link" type="button" onclick="event.stopPropagation(); go('/course?id=${c.id}')">Read Me</button>
 <button class="enquiry" type="button" onclick="event.stopPropagation(); go('/enquiry?courseId=${c.id}')">Enquire</button>
 </div>
 </td>

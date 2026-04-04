@@ -3,6 +3,7 @@ package com.learnsphere.leadservice.course;
 import com.learnsphere.leadservice.admin.AdminService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -54,5 +55,14 @@ public class CourseController {
     ) {
         adminService.validateBasicAuth(authorizationHeader);
         return courseService.updateCourse(id, request);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteCourse(
+            @PathVariable Long id,
+            @RequestHeader(value = "Authorization", required = false) String authorizationHeader
+    ) {
+        adminService.validateBasicAuth(authorizationHeader);
+        courseService.deleteCourse(id);
     }
 }

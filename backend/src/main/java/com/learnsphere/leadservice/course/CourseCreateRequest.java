@@ -9,6 +9,7 @@ public record CourseCreateRequest(
         Integer price,
         @NotBlank @Size(max = 5000) String whyLearn,
         @NotBlank @Size(max = 8000) String toolchainOverview,
-        @NotBlank @Size(max = 8000) String faqContent
+        @NotBlank @Size(max = 8000) String faqContent,
+        @NotBlank @Size(max = 30000) String readmeContent
 ) {
 }

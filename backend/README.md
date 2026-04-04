@@ -53,6 +53,13 @@ Services:
 - Backend: `http://localhost:8080`
 - MySQL: `localhost:3306`
 
+When the Spring Boot app is started from the `backend/` directory, it also serves the SPA entry page for public frontend routes such as:
+
+- `http://localhost:8080/`
+- `http://localhost:8080/courses`
+- `http://localhost:8080/course?id=1`
+- `http://localhost:8080/blogs`
+
 ## Signup endpoint
 
 `POST /api/leads/signup`

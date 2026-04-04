@@ -1,11 +1,20 @@
 function toggleCategories(){
 let menu=document.getElementById("categoriesMenu");
 if(menu) menu.classList.toggle("open");
+closeCourses();
+}
+
+function toggleCourses(){
+let menu=document.getElementById("coursesMenu");
+if(menu) menu.classList.toggle("open");
+closeCategories();
+closeResources();
 }
 
 function toggleResources(){
 let menu=document.getElementById("resourcesMenu");
 if(menu) menu.classList.toggle("open");
+closeCourses();
 }
 
 function handleAdminNav(){
@@ -23,6 +32,7 @@ function openSignupModal(){
 let modal=document.getElementById("signupModal");
 if(modal) modal.classList.add("open");
 closeCategories();
+closeCourses();
 closeResources();
 }
 
@@ -40,6 +50,11 @@ feedback.className="signup-feedback";
 
 function closeCategories(){
 let menu=document.getElementById("categoriesMenu");
+if(menu) menu.classList.remove("open");
+}
+
+function closeCourses(){
+let menu=document.getElementById("coursesMenu");
 if(menu) menu.classList.remove("open");
 }
 
@@ -127,6 +142,15 @@ ${categoryCatalog.map(item=>`<button class="category-item" onclick="go('${item.p
 </div>
 </div>
 </div>
+<div class="courses-wrap">
+<button class="categories-btn" onclick="toggleCourses()">Courses</button>
+<div id="coursesMenu" class="categories-menu">
+<div class="categories-title">Available Courses</div>
+<div id="coursesList" class="categories-list">
+<div class="category-empty">Loading courses...</div>
+</div>
+</div>
+</div>
 <button class="nav-link-btn" onclick="go('/enquiry')">Corporate Training</button>
 <div class="resources-wrap">
 <button class="nav-link-btn" onclick="toggleResources()">Resources</button>
@@ -145,21 +169,30 @@ ${isAdminLoggedIn()?`<button class="nav-link-btn" onclick="adminLogoutAction()">
 </nav>`;
 
 let list=document.getElementById("categoriesList");
-if(!list) return;
+let coursesList=document.getElementById("coursesList");
+if(!list||!coursesList) return;
 try{
 let courses=await getCourses();
 if(courses.length){
 list.innerHTML=categoryCatalog.map(item=>`<button class="category-item" onclick="go('${item.path}')">${item.label}</button>`).join("");
+coursesList.innerHTML=courses
+    .sort((a,b)=>(a.title||"").localeCompare(b.title||""))
+    .map(course=>`<button class="category-item" onclick="go('/course?id=${course.id}')">${course.title}</button>`).join("");
+}else{
+coursesList.innerHTML=`<div class="category-empty">No courses available right now</div>`;
 }
 }catch(e){
 list.innerHTML=categoryCatalog.map(item=>`<button class="category-item" onclick="go('${item.path}')">${item.label}</button>`).join("")+
 `<div class="category-empty">Unable to load courses right now</div>`;
+coursesList.innerHTML=`<div class="category-empty">Unable to load courses right now</div>`;
 }
 }
 
 document.addEventListener("click",function(e){
 let wrap=document.querySelector(".categories-wrap");
 if(wrap&&!wrap.contains(e.target)) closeCategories();
+let courseWrap=document.querySelector(".courses-wrap");
+if(courseWrap&&!courseWrap.contains(e.target)) closeCourses();
 let resourceWrap=document.querySelector(".resources-wrap");
 if(resourceWrap&&!resourceWrap.contains(e.target)) closeResources();
 let modal=document.getElementById("signupModal");

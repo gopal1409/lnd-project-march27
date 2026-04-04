@@ -1,4 +1,6 @@
-const API="http://localhost:8080/api";
+const API=location.port==="8081"
+?`${location.protocol}//${location.host}/api`
+:`${location.protocol}//${location.hostname}:8081/api`;
 
 function getAdminAuthHeader(){
 return localStorage.getItem("adminBasicAuth")||"";
@@ -111,6 +113,15 @@ let r=await apiPut("/courses/"+id,payload);
 let body=await r.json().catch(()=>({message:"Unexpected response from server"}));
 if(!r.ok) throw body;
 return body;
+}
+
+async function deleteCourse(id){
+let r=await apiDelete("/courses/"+id);
+if(!r.ok){
+let body=await r.json().catch(()=>({message:"Unexpected response from server"}));
+throw body;
+}
+return true;
 }
 
 async function createBlog(payload){

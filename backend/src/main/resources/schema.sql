@@ -15,12 +15,14 @@ CREATE TABLE IF NOT EXISTS courses (
     why_learn TEXT NOT NULL,
     toolchain_overview TEXT NOT NULL,
     faq_content TEXT NOT NULL,
+    readme_content TEXT NOT NULL,
     PRIMARY KEY (id)
 );
 
 ALTER TABLE courses ADD COLUMN IF NOT EXISTS why_learn TEXT NULL;
 ALTER TABLE courses ADD COLUMN IF NOT EXISTS toolchain_overview TEXT NULL;
 ALTER TABLE courses ADD COLUMN IF NOT EXISTS faq_content TEXT NULL;
+ALTER TABLE courses ADD COLUMN IF NOT EXISTS readme_content TEXT NULL;
 
 CREATE TABLE IF NOT EXISTS course_enquiries (
     id BIGINT NOT NULL AUTO_INCREMENT,

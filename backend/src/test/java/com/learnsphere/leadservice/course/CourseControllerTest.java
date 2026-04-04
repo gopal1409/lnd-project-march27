@@ -19,6 +19,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -40,7 +41,7 @@ class CourseControllerTest {
 
     @Test
     void getCoursesReturnsAvailableCourses() throws Exception {
-        Course course = new Course("DevSecOps", "Security-first delivery", 49999, "Why it matters", "About the toolchain", "What is it?\nIt is practical.");
+        Course course = new Course("DevSecOps", "Security-first delivery", 49999, "Why it matters", "About the toolchain", "What is it?\nIt is practical.", "Full trainer content");
         when(courseService.getAllCourses()).thenReturn(List.of(course));
 
         mockMvc.perform(get("/api/courses"))
@@ -61,7 +62,7 @@ class CourseControllerTest {
 
     @Test
     void createCourseReturnsCreatedCourseForAuthorizedAdmin() throws Exception {
-        Course course = new Course("Platform Engineering", "Build internal developer platforms", 35000, "Why learn", "Toolchain details", "Question?\nAnswer.");
+        Course course = new Course("Platform Engineering", "Build internal developer platforms", 35000, "Why learn", "Toolchain details", "Question?\nAnswer.", "Full trainer content");
         ReflectionTestUtils.setField(course, "id", 8L);
         doNothing().when(adminService).validateBasicAuth(eq("Basic YWRtaW46QWRtaW5AMTIz"));
         when(courseService.createCourse(any(CourseCreateRequest.class))).thenReturn(course);
@@ -76,7 +77,8 @@ class CourseControllerTest {
                                   "price": 35000,
                                   "whyLearn": "Why learn",
                                   "toolchainOverview": "Toolchain details",
-                                  "faqContent": "Question?\\nAnswer."
+                                  "faqContent": "Question?\\nAnswer.",
+                                  "readmeContent": "Full trainer content"
                                 }
                                 """))
                 .andExpect(status().isOk())
@@ -87,7 +89,7 @@ class CourseControllerTest {
 
     @Test
     void updateCourseReturnsUpdatedCourseForAuthorizedAdmin() throws Exception {
-        Course course = new Course("Azure DevOps", "Updated content", 36000, "Updated why", "Updated toolchain", "Who is this for?\nTeams.");
+        Course course = new Course("Azure DevOps", "Updated content", 36000, "Updated why", "Updated toolchain", "Who is this for?\nTeams.", "Updated trainer content");
         ReflectionTestUtils.setField(course, "id", 5L);
         doNothing().when(adminService).validateBasicAuth(eq("Basic YWRtaW46QWRtaW5AMTIz"));
         when(courseService.updateCourse(eq(5L), any(CourseCreateRequest.class))).thenReturn(course);
@@ -102,12 +104,22 @@ class CourseControllerTest {
                                   "price": 36000,
                                   "whyLearn": "Updated why",
                                   "toolchainOverview": "Updated toolchain",
-                                  "faqContent": "Who is this for?\\nTeams."
+                                  "faqContent": "Who is this for?\\nTeams.",
+                                  "readmeContent": "Updated trainer content"
                                 }
                                 """))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(5))
                 .andExpect(jsonPath("$.title").value("Azure DevOps"))
                 .andExpect(jsonPath("$.whyLearn").value("Updated why"));
+    }
+
+    @Test
+    void deleteCourseReturnsOkForAuthorizedAdmin() throws Exception {
+        doNothing().when(adminService).validateBasicAuth(eq("Basic YWRtaW46QWRtaW5AMTIz"));
+
+        mockMvc.perform(delete("/api/courses/4")
+                        .header("Authorization", "Basic YWRtaW46QWRtaW5AMTIz"))
+                .andExpect(status().isOk());
     }
 }

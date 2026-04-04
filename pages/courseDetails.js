@@ -47,6 +47,19 @@ return (text||"")
     .join("");
 }
 
+function formatReadmeContent(text){
+return (text||"")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/\n/g,"<br>");
+}
+
+function scrollToCourseReadme(){
+let section=document.getElementById("courseReadmeSection");
+if(section) section.scrollIntoView({behavior:"smooth",block:"start"});
+}
+
 async function submitCourseEnrollForm(courseId){
 let name=document.getElementById("courseEnrollName");
 let email=document.getElementById("courseEnrollEmail");
@@ -143,14 +156,15 @@ app.innerHTML=`
 <h1 id="courseEnrollTitle">${c.title}</h1>
 <p>${c.description}</p>
 <div class="learning-cta-row">
+<button class="nav-link-btn learning-secondary" type="button" onclick="scrollToCourseReadme()">Read Me</button>
 <button class="enquiry" type="button" onclick="openCourseEnrollModal()">Enroll for the Program</button>
 <button class="nav-link-btn learning-secondary" type="button" onclick="go('/enquiry?courseId=${c.id}')">Talk to an Advisor</button>
 </div>
 </div>
 <aside class="learning-sidebar">
 <div class="learning-side-card">
-<h3>Why learn this course</h3>
-<p>${c.whyLearn}</p>
+<h3>Course summary</h3>
+<p>${c.description}</p>
 </div>
 <div class="learning-side-card">
 <h3>Program focus</h3>
@@ -181,6 +195,19 @@ app.innerHTML=`
 <li>Guided next steps through FAQs, related blogs, and enrollment support.</li>
 </ul>
 </article>
+</section>
+
+<section id="courseReadmeSection" class="learning-article course-program-article">
+<article class="learning-article-main">
+<h2>Read Me</h2>
+<div class="course-readme-block">${formatReadmeContent(c.readmeContent||c.toolchainOverview)}</div>
+</article>
+<aside class="learning-article-aside">
+<div class="learning-side-card">
+<h3>Full curriculum</h3>
+<p>This section shows the complete trainer-managed curriculum, including daily modules, labs, assignments, architecture flow, and enterprise practices.</p>
+</div>
+</aside>
 </section>
 
 <section class="learning-article course-program-article">
