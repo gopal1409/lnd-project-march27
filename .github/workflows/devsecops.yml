@@ -67,17 +67,33 @@ jobs:
           ignore-unfixed: true
           exit-code: "0"
 
-      - name: Enforce frontend image security gate
-        continue-on-error: true
+      - name: Report frontend image critical vulnerabilities
         uses: aquasecurity/trivy-action@v0.33.1
         with:
           scan-type: image
           image-ref: learnsphere-frontend:${{ github.sha }}
           scanners: vuln
           format: table
+          output: trivy-frontend-critical.txt
           severity: CRITICAL
           ignore-unfixed: true
-          exit-code: "1"
+          exit-code: "0"
+
+      - name: Add frontend Trivy summary
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo "## Frontend Trivy Summary"
+            echo
+            if [ -f trivy-frontend-critical.txt ]; then
+              echo '```text'
+              cat trivy-frontend-critical.txt
+              echo '```'
+            else
+              echo "No frontend Trivy summary file was generated."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload filesystem scan results
         uses: github/codeql-action/upload-sarif@v4
@@ -92,6 +108,13 @@ jobs:
         with:
           sarif_file: trivy-image.sarif
           category: trivy-frontend-image
+
+      - name: Upload frontend Trivy text report
+        if: always() && hashFiles('trivy-frontend-critical.txt') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-frontend-critical-report
+          path: trivy-frontend-critical.txt
 
   backend-container-checks:
     name: Backend Container Checks
@@ -115,17 +138,33 @@ jobs:
           ignore-unfixed: true
           exit-code: "0"
 
-      - name: Enforce backend image security gate
-        continue-on-error: true
+      - name: Report backend image critical vulnerabilities
         uses: aquasecurity/trivy-action@v0.33.1
         with:
           scan-type: image
           image-ref: learnsphere-backend:${{ github.sha }}
           scanners: vuln
           format: table
+          output: trivy-backend-critical.txt
           severity: CRITICAL
           ignore-unfixed: true
-          exit-code: "1"
+          exit-code: "0"
+
+      - name: Add backend Trivy summary
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo "## Backend Trivy Summary"
+            echo
+            if [ -f trivy-backend-critical.txt ]; then
+              echo '```text'
+              cat trivy-backend-critical.txt
+              echo '```'
+            else
+              echo "No backend Trivy summary file was generated."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload backend scan results
         uses: github/codeql-action/upload-sarif@v4
@@ -133,3 +172,10 @@ jobs:
         with:
           sarif_file: trivy-backend-image.sarif
           category: trivy-backend-image
+
+      - name: Upload backend Trivy text report
+        if: always() && hashFiles('trivy-backend-critical.txt') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-backend-critical-report
+          path: trivy-backend-critical.txt

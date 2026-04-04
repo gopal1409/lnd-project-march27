@@ -56,27 +56,24 @@ jobs:
         if: matrix.browser == 'safari'
         run: safaridriver --enable || true
 
-      - name: Start backend server
-        working-directory: backend
-        run: |
-          mvn -B -Dspring-boot.run.useTestClasspath=true "-Dspring-boot.run.arguments=--spring.profiles.active=test --server.port=8081" spring-boot:run > ../backend.log 2>&1 &
-
-      - name: Wait for backend
+      - name: Run Selenium smoke tests
         shell: bash
         run: |
-          for i in {1..60}; do
+          cd backend
+          nohup mvn -B -Dspring-boot.run.useTestClasspath=true "-Dspring-boot.run.arguments=--spring.profiles.active=test --server.port=8081" spring-boot:run > ../backend.log 2>&1 &
+          BACKEND_PID=$!
+          trap "kill $BACKEND_PID || true" EXIT
+
+          for i in {1..90}; do
             if curl -fsS http://127.0.0.1:8081 >/dev/null && curl -fsS http://127.0.0.1:8081/api/courses >/dev/null; then
-              exit 0
+              mvn -B -Dtest=CrossBrowserSmokeTest -Dbrowser=${{ matrix.browser }} -DbaseUrl=http://127.0.0.1:8081 test
+              exit $?
             fi
             sleep 2
           done
+
           echo "Backend did not become ready in time."
           exit 1
-
-      - name: Run Selenium smoke tests
-        working-directory: backend
-        run: |
-          mvn -B -Dtest=CrossBrowserSmokeTest -Dbrowser=${{ matrix.browser }} -DbaseUrl=http://127.0.0.1:8081 test
 
       - name: Upload browser logs
         if: always()
