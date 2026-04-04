@@ -50,7 +50,7 @@ jobs:
           cache: true
 
       - name: Run Trivy filesystem scan
-        uses: aquasecurity/trivy-action@v0.33.1
+        uses: aquasecurity/trivy-action@0.35.0
         with:
           skip-setup-trivy: true
           scan-type: fs
@@ -63,7 +63,7 @@ jobs:
           exit-code: "0"
 
       - name: Run Trivy image scan
-        uses: aquasecurity/trivy-action@v0.33.1
+        uses: aquasecurity/trivy-action@0.35.0
         with:
           skip-setup-trivy: true
           scan-type: image
@@ -76,7 +76,7 @@ jobs:
           exit-code: "0"
 
       - name: Report frontend image critical vulnerabilities
-        uses: aquasecurity/trivy-action@v0.33.1
+        uses: aquasecurity/trivy-action@0.35.0
         with:
           skip-setup-trivy: true
           scan-type: image
@@ -142,7 +142,7 @@ jobs:
           cache: true
 
       - name: Run Trivy backend image scan
-        uses: aquasecurity/trivy-action@v0.33.1
+        uses: aquasecurity/trivy-action@0.35.0
         with:
           skip-setup-trivy: true
           scan-type: image
@@ -155,7 +155,7 @@ jobs:
           exit-code: "0"
 
       - name: Report backend image critical vulnerabilities
-        uses: aquasecurity/trivy-action@v0.33.1
+        uses: aquasecurity/trivy-action@0.35.0
         with:
           skip-setup-trivy: true
           scan-type: image
