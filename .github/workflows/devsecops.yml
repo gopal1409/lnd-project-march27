@@ -44,9 +44,9 @@ jobs:
         run: docker build -t learnsphere-frontend:${{ github.sha }} .
 
       - name: Set up Trivy
-        uses: aquasecurity/setup-trivy@e6c2c5e321ed9123bda567646e2f96565e34abe1
+        uses: aquasecurity/setup-trivy@e07451d2e059ed86c2870430ea286b3a9e0bf241
         with:
-          version: v0.68.1
+          version: v0.68.2
           cache: true
 
       - name: Run Trivy filesystem scan
@@ -136,9 +136,9 @@ jobs:
         run: docker build -t learnsphere-backend:${{ github.sha }} -f backend/Dockerfile .
 
       - name: Set up Trivy
-        uses: aquasecurity/setup-trivy@e6c2c5e321ed9123bda567646e2f96565e34abe1
+        uses: aquasecurity/setup-trivy@e07451d2e059ed86c2870430ea286b3a9e0bf241
         with:
-          version: v0.68.1
+          version: v0.68.2
           cache: true
 
       - name: Run Trivy backend image scan
