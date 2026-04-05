@@ -248,6 +248,24 @@ jobs:
         if: always()
         run: docker compose down -v
 
+  dockerhub-secrets-notice:
+    name: Docker Hub Secrets Notice
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && (secrets.DOCKERHUB_USERNAME == '' || secrets.DOCKERHUB_TOKEN == '')
+    steps:
+      - name: Add workflow summary notice
+        shell: bash
+        run: |
+          {
+            echo "## Docker Hub Publish Skipped"
+            echo
+            echo "The \`publish-images\` job was skipped because one or both Docker Hub secrets are missing."
+            echo
+            echo "Required repository secrets:"
+            echo "- \`DOCKERHUB_USERNAME\`"
+            echo "- \`DOCKERHUB_TOKEN\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
   publish-images:
     name: Publish Docker Images
     runs-on: ubuntu-latest
@@ -257,7 +275,7 @@ jobs:
       - frontend-container-checks
       - backend-container-checks
       - dast-zap
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' && secrets.DOCKERHUB_USERNAME != '' && secrets.DOCKERHUB_TOKEN != ''
     strategy:
       fail-fast: false
       matrix:
@@ -271,6 +289,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
+
+      - name: Validate Docker Hub secrets
+        run: |
+          echo "Docker Hub publishing enabled for user: ${{ secrets.DOCKERHUB_USERNAME }}"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
