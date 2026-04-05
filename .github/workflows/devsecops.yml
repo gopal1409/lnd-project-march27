@@ -248,10 +248,32 @@ jobs:
         if: always()
         run: docker compose down -v
 
+  dockerhub-config:
+    name: Docker Hub Config Check
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    outputs:
+      has_credentials: ${{ steps.check.outputs.has_credentials }}
+    steps:
+      - name: Check Docker Hub secrets
+        id: check
+        shell: bash
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        run: |
+          if [ -n "$DOCKERHUB_USERNAME" ] && [ -n "$DOCKERHUB_TOKEN" ]; then
+            echo "has_credentials=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_credentials=false" >> "$GITHUB_OUTPUT"
+          fi
+
   dockerhub-secrets-notice:
     name: Docker Hub Secrets Notice
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && (secrets.DOCKERHUB_USERNAME == '' || secrets.DOCKERHUB_TOKEN == '')
+    needs:
+      - dockerhub-config
+    if: github.event_name == 'push' && needs.dockerhub-config.outputs.has_credentials != 'true'
     steps:
       - name: Add workflow summary notice
         shell: bash
@@ -275,7 +297,8 @@ jobs:
       - frontend-container-checks
       - backend-container-checks
       - dast-zap
-    if: github.event_name == 'push' && secrets.DOCKERHUB_USERNAME != '' && secrets.DOCKERHUB_TOKEN != ''
+      - dockerhub-config
+    if: github.event_name == 'push' && needs.dockerhub-config.outputs.has_credentials == 'true'
     strategy:
       fail-fast: false
       matrix:
